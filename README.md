@@ -51,28 +51,28 @@ Only files in this format will be shared. You can check in the Sia-UI to see the
 To unshare a file, just click the Unshare button. The file will then be renamed to the original file name plus its extension (e.g. .jpg, .doc, .pdf etc).
 <h3>Share Sia Files</h3>
 To start sharing your files, click on the Enable button. Explorers who have your Sharer ID and public key will now be able to view/download/purchase your files. In the command line, if successful, you should see the output Connected to STUN server. To stop sharing, press the Disable button. Please note that you need to leave this app running to continue sharing your files.
-Sia Explore
+<h3>Sia Explore</h3>
 This section is where you can view the files of other Sia users (i.e. Sharers). Enter the Sharer ID and Public Key into the input boxes and press Connect. A random string will also be generated, encrypted and sent to the Sharer for verification.
-If the connection is successful (a connection log is generated at the bottom of the page), a list of the Sharer's files will then appear. If the Sharer was able to decrypt the verification message, the message Sharer Verification: Success appears, else the message Sharer Verification: Fail appears. 
-Notice the field Purchase Status. There are three possible values:
-1. FREEFILE: If the price of a file is 0, then the Explorer can download the file without purchase. The Download button will appear.
-2. FILEPURCHASED: If the Explorer has purchased the file previously, the Explorer can download the file by press the Download button. Note the Explorer must use the same Explorer ID that they used to previously purchase the file.
-3. FILENOTPURCHASED: If the file price is greater than 0 and the Explorer has not purchased the file previously, then the Explorer will have to click the Purchase button to buy the file.
-Download File
-To download a file, press Download. This initiates a 2 step process:
-1. The Sharer's computer will download the requested file from the Sia network. A progress update is provided every 10 seconds stating the download completed percentage from the Sia network to the Sharer computer.
+If the connection is successful (a connection log is generated at the bottom of the page), a list of the Sharer's files will then appear. If the Sharer was able to decrypt the verification message, the message Sharer Verification: Success appears, else the message Sharer Verification: Fail appears. <br><p></p>
+Notice the field Purchase Status. There are three possible values:<br><p></p>
+1. FREEFILE: If the price of a file is 0, then the Explorer can download the file without purchase. The Download button will appear.<br><p></p>
+2. FILEPURCHASED: If the Explorer has purchased the file previously, the Explorer can download the file by press the Download button. Note the Explorer must use the same Explorer ID that they used to previously purchase the file.<br><p></p>
+3. FILENOTPURCHASED: If the file price is greater than 0 and the Explorer has not purchased the file previously, then the Explorer will have to click the Purchase button to buy the file.<br><p></p>
+<h4>Download File</h4>
+To download a file, press Download. This initiates a 2 step process:<br><p></p>
+1. The Sharer's computer will download the requested file from the Sia network. A progress update is provided every 10 seconds stating the download completed percentage from the Sia network to the Sharer computer.<br><p></p>
 2. The Sharer then transfers the file to the Explorer via WebRTC. A near real time download update is generated on the page.
-Once the file is transferred, a download link is generated. Right click, select 'Save Link As' and save to desired location.
-Purchase File
-To purchase a file, press Purchase. This triggers the Sharer to create a Sia address that is used as the Purchase Address i.e. the address to which the Explorer will make the payment to purchase the file. Review the purchase details and then press Confirm Payment. This will initiate a payment from your wallet. The payment amount is broken down into 4 components:
-1. File Price
-2. Developer Fee (fixed at 2 Siacoin, regardless of File Price)
-3. Transaction Fee for File Price (0.75 Siacoin)
-4. Transaction Fee for Developer Fee (0.75 Siacoin)
-Please wait up to 60 seconds while the Sharer checks the purchase address to make sure a payment has been made. If the payment is successful, an alert message will state payment successful, else an alert message will give you an error. If successful, refresh the page and re-enter the Sharer ID and public key. You will then see the Download button for the file you just purchased. 
-Premium File History
+Once the file is transferred, a download link is generated. Right click, select 'Save Link As' and save to desired location.<br><p></p>
+<h4>Purchase File</h4>
+To purchase a file, press Purchase. This triggers the Sharer to create a Sia address that is used as the Purchase Address i.e. the address to which the Explorer will make the payment to purchase the file. Review the purchase details and then press Confirm Payment. This will initiate a payment from your wallet. The payment amount is broken down into 4 components:<br><p></p>
+1. File Price<br><p></p>
+2. Developer Fee (fixed at 2 Siacoin, regardless of File Price)<br><p></p>
+3. Transaction Fee for File Price (0.75 Siacoin)<br><p></p>
+4. Transaction Fee for Developer Fee (0.75 Siacoin)<br><p></p>
+Please wait up to 60 seconds while the Sharer checks the purchase address to make sure a payment has been made. If the payment is successful, an alert message will state payment successful, else an alert message will give you an error. If successful, refresh the page and re-enter the Sharer ID and public key. You will then see the Download button for the file you just purchased. <br><p></p>
+<h3>Premium File History</h3>
 This section lists all the files that you have bought and sold. Note only file transactions that had a price greater than 0 are listed here (free file transactions are not listed).
-About
+<h3>About</h3>
 MIT license for the app, as well as the license for PeerJS.
-Shut Down
+<h3>Shut Down</h3>
 Back in your command line, press Ctrl+C. This will terminate the app and any other associated processes.
