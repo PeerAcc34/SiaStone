@@ -76,7 +76,7 @@ This section lists all the files that you have bought and sold. Note only file t
 MIT license for the app, as well as the license for PeerJS.
 <h3>Shut Down</h3>
 Back in your command line, press Ctrl+C. This will terminate the app and any other associated processes.
-<h3>Personal Interest Disclosure</h3>
+<h2>Personal Interest Disclosure</h2>
 There are two ways I can monetarily benefit from this app:<br><p></p> 
 1. Each 'Premium' file transaction (i.e. where the file price is not '0'), a developer fee of 2 Siacoins, paid by the Explorer, is levied. This developer fee is fixed, regardless of the price of the file being transacted (i.e. the file could cost 1 Siacoin or a billion Siacoin, the developer fee will still be 2 Siacoin). Files with a price of 0 have no developer fee.<br><p></p>
 2. By purchasing products and services via the affiliate link banners in the app. Coinmama allows you to buy Bitcoin and I get a commission from your purchase. Similar case for Torguard, a VPN service that accepts several cryptocurrencies, where I get a commission from items you purchase via my affiliate link. Torguard also offers a dedicated VPN IP, which may be of interest to those of you looking for a static IP for your Sia hosting. The BitCasino affiliate, as the name suggests, is an online casino that accepts Bitcoin. Please note that this service is for people aged 18+ and live in jurisdictions where online gambling is permitted. If this is of interest to you, please play responsibly else please do not play at all.<br><p></p>
