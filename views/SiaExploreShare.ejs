@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Share your files</title>
+  </head>
+  <%include partials/aff.ejs%>
+  <%include partials/loggedInNav.ejs%>
+
+  <body>
+    <h1>Share Your Files</h1>
+    Once you have chosen files to share and confirmed your settings, you can press 'Enable' to share your files.<br>
+    Sia users who have your SharerID and Public Key can then view, download and purchase your files.<br>
+    You can press 'Disable' if you subsequently wish to stop sharing your files.<br>
+    Note you must keep Chrome running to continue making your files available to other Sia users
+    <p></p>
+    <div class="">
+      <form  action="/SiaExploreShare" method="post">
+        <input id="ShareStatus" name="ShareStatus" label='Status' value='<%=PeerFlag%>'>
+        <button id="ShareButton" name="ShareButton" type="submit"><%=PeerFlag%></button>
+      </form>
+    </div>
+ 
+
+  </body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Transactions</title>
+  </head>
+  <style media="screen">
+
+  table, th, td {
+      border: 1px solid black;
+  }
+  td {
+      word-wrap: break-word;
+  }
+  </style>
+  
+  <%include partials/aff.ejs%>
+  <%include partials/loggedInNav.ejs%>
+  <body>
+    This is a list of your Premium File Transactions
+
+    <table style="table-layout: fixed; width: 100%">
+       <tr>
+          <th>Transaction Date</th><th>Transaction Type</th><th>Sharer ID</th><th>Explorer ID</th><th>File ID</th><th>Price</th><th>Purchase Address</th>
+       </tr>
+
+
+
+       <% for (var i = 0; i < PremiumTransfers.length; i++) {%>
+         <!-- Split the file name into its component names and display in table -->
+        <tr>
+          <td><%- new Date(PremiumTransfers[i].TransactionDate) %></td>
+          <td><%- PremiumTransfers[i].TransactionType %></td>
+          <td><%- PremiumTransfers[i].SharerID %></td>
+          <td><%- PremiumTransfers[i].ExplorerID %></td>
+          <td><%- PremiumTransfers[i].FileID %></td>
+          <td><%- PremiumTransfers[i].Price %></td>
+          <td><%- PremiumTransfers[i].PurchaseAddress %></td>
+        </tr>
+        <%}%>
+   </table>
+  </body>
+</html>

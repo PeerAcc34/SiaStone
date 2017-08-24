@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Welcome to your files!</title>
+  </head>
+  <style media="screen">
+
+  table, th, td {
+      border: 1px solid black;
+  }
+  td {
+      word-wrap: break-word;
+  }
+  </style>
+<script src="/public/assets/jquery.min.js"></script>
+<script type="text/javascript">
+//A function to break up a file name into its key fields (i.e. name, price, fileid, etc)
+function getPositionJS(string, subString, index) {
+   return string.split(subString, index).join(subString).length;
+ }
+</script>
+
+  <script>
+  //Store the array of file from EJS into JS
+  var SiaFileArr = <%- JSON.stringify(SiaFiles) %>;
+  </script>
+
+  <script>
+  function Share(id) {
+      //Show the area where you can set the details of the file you want to share
+	  ShowIt();
+      document.getElementById("FileName").value = SiaFileArr[id].siapath.substring(0,SiaFileArr[id].siapath.lastIndexOf("."));
+      document.getElementById("SiaFilePath").value = SiaFileArr[id].siapath;
+      document.getElementById("FileExtension").value = SiaFileArr[id].siapath.substring(SiaFileArr[id].siapath.lastIndexOf(".")+1);
+  }
+  </script>
+
+  <script>
+  function Unshare(id) {
+
+      //Unshare the file. Set the file name and extension as the new file name but delete other details (price, description, fileid etc)
+      document.getElementById("ShareForm").reset();
+      document.getElementById("ShareType").value='Unshare';
+      document.getElementById("FileName").value = SiaFileArr[id].siapath.substring(getPositionJS(SiaFileArr[id].siapath,"^",1)+1,getPositionJS(SiaFileArr[id].siapath,"^",2));
+      document.getElementById("SiaFilePath").value = SiaFileArr[id].siapath;
+      document.getElementById("FileExtension").value = SiaFileArr[id].siapath.substring(SiaFileArr[id].siapath.lastIndexOf(".")+1);
+      document.getElementById("ShareForm").submit();
+  }
+  </script>
+
+  <script>
+      function ShowIt(){
+	  //Show the area to edit file share details
+         var obj = document.getElementById("hid");
+         if(obj.style.display == "block")
+            obj.style.display = "none";
+         else
+            obj.style.display = "block";
+      };
+      ShowIt();
+   </script>
+
+<!-- An EJS function to break up a file name into its key fields (i.e. name, price, fileid, etc) -->
+  <%
+  function getPosition(string, subString, index) {
+     return string.split(subString, index).join(subString).length;
+  }
+  %>
+
+  <%include partials/aff.ejs%>
+  <%include partials/loggedInNav.ejs%>
+
+  <body>
+    <h1>Manage Your Files</h1>
+    This section is where you select which files to share/unshare. When you share a file, you can modify the file name, provide a file description, as well as set <br>
+    a price for your file (if you wish your file to be free, just set the price to 0).<br>
+    Once you share a file, a unique ID (i.e. a Sia address), will be assigned to it.<br>
+    <p></p>
+
+
+<table style="table-layout: fixed; width: 100%">
+   <tr>
+      <th>FileName</th><th>File Extension</th><th>Share Status</th><th>Description</th><th>Upload Status %</th><th>Price</th><th>File ID</th><th>File Size</th><th>Share/Unshare</th>
+   </tr>
+
+   <% for (var i = 0; i < SiaFiles.length; i++) {
+
+      <!-- Split the file name into its component names and display in table -->
+		
+   <!-- If the file is being shared, split the file name accordingly (i.e. name, price, fileid, description, etc) -->
+     if(    SiaFiles[i].siapath.substring(0,12)==='SiaStoneFile' ){%>
+
+    <tr id="<%-SiaFiles[i].siapath%>">
+      <td><%- SiaFiles[i].siapath.substring(getPosition(SiaFiles[i].siapath,"^",1)+1,getPosition(SiaFiles[i].siapath,"^",2)).replace("%20"," ") %></td>
+      <td><%- (SiaFiles[i].siapath.substring(SiaFiles[i].siapath.lastIndexOf(".")+1)).toUpperCase() %></td>
+      <td>Sharing</td>
+      <td><%= SiaFiles[i].siapath.substring(getPosition(SiaFiles[i].siapath,"^",2)+1,getPosition(SiaFiles[i].siapath,"^",3)).replace("%20"," ") %></td>
+      <td><%= parseInt(SiaFiles[i].uploadprogress).toFixed(2) %></td>
+      <td><%= SiaFiles[i].siapath.substring(getPosition(SiaFiles[i].siapath,"^",3)+1,getPosition(SiaFiles[i].siapath,"^",4)) %></td>
+      <td><%= SiaFiles[i].siapath.substring(getPosition(SiaFiles[i].siapath,"^",4)+1,SiaFiles[i].siapath.lastIndexOf(".")) %></td>
+
+      <td><%= (parseInt(SiaFiles[i].filesize)/1000000).toFixed(2) %>MB</td>
+      <td><button id="<%-[i]%>" type="button" value="<%-[i]%>" name="button" onclick="Unshare(<%-[i]%>);">Unshare</button></td>
+    </tr>
+	<!-- if the file is not being shared, just show the file name, extension and size -->
+   <% }else{ %>
+     <tr id="<%-SiaFiles[i].siapath%>">
+       <td><%- SiaFiles[i].siapath.substring(0,SiaFiles[i].siapath.lastIndexOf(".")).replace("%20"," ") %></td>
+       <td><%- (SiaFiles[i].siapath.substring(SiaFiles[i].siapath.lastIndexOf(".")+1)).toUpperCase() %></td>
+       <td>Not Sharing</td>
+       <td><%= SiaFiles[i].siapath.substring(getPosition(SiaFiles[i].siapath,"^",2)+1,getPosition(SiaFiles[i].siapath,"^",3)).replace("%20"," ") %></td>
+       <td><%= parseInt(SiaFiles[i].uploadprogress).toFixed(2) %></td>
+       <td>N/A</td>
+       <td>N/A</td>
+       <td><%= (parseInt(SiaFiles[i].filesize)/1000000).toFixed(2) %>MB</td>
+       <td><button id="<%-[i]%>" type="button" value="<%-[i]%>" name="button" onclick="Share(<%-[i]%>);">Share</button></td>
+     </tr>
+     <%}}%>
+</table>
+
+<div class="wrapper">
+    <section id="hid" style="display: none;">
+      <h1>Rename and edit settings of your file here</h1>
+<!-- Define the form where details for file sharing/unsharing are set -->
+      <form id="ShareForm" action="/SiaRenterFiles" method="post">
+
+        <input id="ShareType" type="hidden" name="ShareType" value='Share'>
+        <input id="FileExtension" type="hidden" name="FileExtension">
+        <input id="SiaFilePath" type="hidden" name="SiaFilePath">
+
+        <label for="FileName">File Name</label>
+        <input id="FileName" type="text" name="FileName">
+
+        <label for="FileDescription">New Description</label>
+        <input id="FileDescription" type="text" name="FileDescription" value="">
+
+        <label for="FilePrice">New Price</label>
+        <input id="FilePrice" type="number" name="FilePrice" value="" step="1" min="0">
+          <button type="submit">Confirm Share</button>
+
+      </form>
+
+    </section>
+
+</div>
+
+  </body>
+</html>

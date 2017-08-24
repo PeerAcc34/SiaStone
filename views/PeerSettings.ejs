@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Settings</title>
+  </head>
+
+  <script type="text/javascript" src="/public/assets/jquery.min.js"></script>
+  <script>
+
+  $(document).ready(function() {
+
+	//ajax function to send updated setting to nodejs server to save
+    $('#confirmSettings').click(function() {
+      $.ajax({
+        type: 'POST',
+        url: "/SiaStoneSettings",
+        data: {
+          sharer: $('#ShareID').val(), //SharerID (how others find you)
+          explorer: $('#ExploreID').val(), //Explorer ID (how you identify yourself to others)
+          maxbuffers: $('#MaxBuffer').val(), //Set the maximum amount of buffer space for file transfers
+          maxpeers: $('#MaxPeers').val(), //Set the maximum number of peers allowed to connect to you at the same time
+          peerjskey: $('#peerjskey').val(), //A key to connect to the PeerJS cloud STUN server
+          APIPortNumber: $('#APIPortNumber').val(), //API port for the Sia client
+          host: $('#host').val(), //STUN HOST
+          port: $('#port').val(), //STUN Port
+          path: $('#path').val() //STUN path
+        },
+        dataType: 'json',
+        success: function(successResponse) {
+          alert('Settings changed successfully');
+          location.reload();
+        },
+        error: function(errorResponse) {
+          alert('Sorry. There was an error: '+errorResponse);
+        }
+
+      });
+    });
+
+    $('#newKeys').click(function() {
+	//Generate public and private keys which is used to verify a Sharer
+      $.ajax({
+        type: 'POST',
+        url: "/GenRsaKeys",
+        dataType: 'json',
+        success: function(successResponse) {
+          alert('New Keys Generated');
+          location.reload();
+        },
+        error: function(errorResponse) {
+          alert('Sorry. There was an error: '+JSON.stringify(errorResponse));
+        }
+
+      });
+    });
+
+  });
+  </script>
+
+<style>
+
+.container {
+    width: 500px;
+    clear: both;
+}
+.container input {
+    width: 100%;
+    clear: both;
+}
+
+/*label {
+  float: left;
+  width: 20%;
+  text-align: right;
+  margin-right: 0.5em;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+}*/
+
+input {
+  float:left;
+  margin-left:30px;
+}
+
+select {
+  float:left;
+  margin-left:30px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+</style>
+
+
+  <%include partials/aff.ejs%>
+  <%include partials/loggedInNav.ejs%>
+
+  <body>
+<h1>Settings</h1>
+This section is where you select your SharerID and Public Key (how other Sia users find and verify you),<br>
+your ExplorerID (how you identify yourself to other Sia users), as well as other Sia API and PeerJS settings
+<div>
+  The unlock status of your wallet is: <%- Settings.Enc %>
+</div>
+
+<div>
+<h4>Your Current Settings</h4>
+<table>
+  <tr>
+    <td>Sharer ID (SHARE THIS)</td><td><%- Settings.ShareID %></td>
+  </tr>
+  <tr>
+    <td>Explore ID</td><td><%- Settings.ExploreIDSetting %></td>
+  </tr>
+  <tr>
+    <td>Maximum Buffer Size (GB)</td><td><%- Settings.MaxBufferSetting %></td>
+  </tr>
+  <tr>
+    <td>Maximum Number of Peers</td><td><%- Settings.MaxPeerSetting %><td></td>
+  </tr>
+  <tr>
+    <td>API Port Number</td><td><%- Settings.APIPortNumber %><td></td>
+  </tr>
+  <tr>
+    <td>Host</td><td><%- Settings.Host %><td></td>
+  </tr>
+  <tr>
+    <td>Port</td><td><%- Settings.Port %><td></td>
+  </tr>
+  <tr>
+    <td>Path</td><td><%- Settings.Path %><td></td>
+  </tr>
+  <tr>
+    <td>PeerJS Key</td><td><%- Settings.PeerJSKey %><td></td>
+  </tr>
+  <tr>
+    <td>Public Key (SHARE THIS)</td><td><%- '-----BEGIN PUBLIC KEY-----'+Settings.PublicKey.substring(27,Settings.PublicKey.indexOf('-----END PUBLIC KEY-----')-1).replace(/ /g,'')+'-----END PUBLIC KEY-----' %><td></td>
+  </tr>
+  <tr>
+    <td>Private Key (DO NOT SHARE)</td><td><%- '-----BEGIN RSA PRIVATE KEY-----'+Settings.PrivateKey.substring(33,Settings.PrivateKey.indexOf('-----END RSA PRIVATE KEY-----')-1).replace(/ /g,'')+'-----END RSA PRIVATE KEY-----' %><td></td>
+  </tr>
+</table>
+</div>
+
+<div id='changeSettings'  class="container">
+  <h4>Change Settings</h4>
+
+   <label for="ShareID">Share ID</label>
+   <select id="ShareID" name="ShareID" value=<%- JSON.stringify(Settings.ShareID) %>>
+       <%for(var i = 0; i < Addresses.addresses.length; i++){%>
+         <option value="<%= Addresses.addresses[i] %>"><%= Addresses.addresses[i] %></option>
+       <% } %>
+   </select><br>
+
+   <label for="ExploreID">Explore ID</label>
+   <select id="ExploreID" name="ExploreID">
+       <%for(var i = 0; i < Addresses.addresses.length; i++){%>
+         <option value="<%= Addresses.addresses[i] %>"><%= Addresses.addresses[i] %></option>
+       <% } %>
+   </select><br>
+
+   <label for="MaxBuffer">Maximum Buffer Size (GB)</label>
+   <input id="MaxBuffer" type="number" name="MaxBuffer" value="1" step="0.1" min="0"><br>
+
+   <label for="MaxPeers">Maximum Number of Peers</label>
+   <input id="MaxPeers" type="number" name="MaxPeers" value="5" step="1" min="0"><br>
+
+   <label for="peerjskey">PeerJS Key</label>
+   <input id="peerjskey" type="text" name="peerjskey"><br>
+
+   <label for="APIPortNumber">API Port Number</label>
+   <input id="APIPortNumber" type="number" name="APIPortNumber" value="9980" min="0"><br>
+
+   <label for="host">Host</label>
+   <input id="host" type="text" name="host" value="0.peerjs.com"><br>
+
+   <label for="port">Port</label>
+   <input id="port" type="number" name="port" value="9000"><br>
+
+   <label for="path">Path</label>
+   <input id="path" type="text" name="path" value=""><br>
+
+  <button id="confirmSettings" name="confirmSettings">Confirm Settings</button><br>
+<br>
+<p></p>
+</div>
+<div class="container">
+  <h4>Change Public and Private Keys</h4>
+<button id="newKeys" name="newKeys">Generate New Keys</button>
+</div>
+  </body>
+</html>
