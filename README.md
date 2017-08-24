@@ -14,42 +14,42 @@ Just a quick note on some of the terminology I will use: <br><p></p>
 2. Google Chrome (I developed this with Chrome so I am confident that it works with this browser. I have not tried other browsers extensively, but FireFox is definitely not compatible with some of the functionalities of PeerJS).<br><p></p>
 3. Node.js installed<br><p></p>
 4. A free PeerJS cloud API key from http://peerjs.com/peerserver <br><p></p>
-Walkthrough
-Start up
-1. Download the SiaStone zip file from GitHub and unzip
-2. In the command line of your operating system, navigate to the SiaStone directory
-3. Type 'npm install'. This will install the required modules for the app to run.
-4. Once 'npm install' has completed, type 'node SiaStone'. If successful, you should get a message saying "Listening on Port 3000". 
-5. In your browser (preferably Chrome), type 'localhost:3000'. This should give you the 'Settings Page'.
-6. For subsequent uses of the app, just follow steps 4 and 5.
-Settings Page
+<h2>Walkthrough</h2>
+<h3>Start up</h3>
+1. Download the SiaStone zip file from GitHub and unzip<br><p></p>
+2. In the command line of your operating system, navigate to the SiaStone directory<br><p></p>
+3. Type 'npm install'. This will install the required modules for the app to run.<br><p></p>
+4. Once 'npm install' has completed, type 'node SiaStone'. If successful, you should get a message saying "Listening on Port 3000". <br><p></p>
+5. In your browser (preferably Chrome), type 'localhost:3000'. This should give you the 'Settings Page'.<br><p></p>
+6. For subsequent uses of the app, just follow steps 4 and 5.<br><p></p>
+<h3>Settings Page</h3>
 The first page that you will see is the Settings page. This page is where you set your Explorer ID that you will use to view and buy files of other Sia users, as well as set your Sharer ID which you publicize to allow other Sia users to view and buy your files. 
-On first use of the app, the Your Current Settings section will have blank values (except for API Port Number to connect to Sia). Scroll down to Change Settings to change the values:
-1. Sharer ID: The ID that you share publicly (e.g. social media, forums, etc) to allow other Sia users to find you and view/purchase files. This is chosen from one of your Sia addresses.
-2. Explorer ID: The ID that identifies you when you view another users files and make purchases. This is chosen from one of your Sia addresses.
-3. Maximum Buffer Size: Since a Sharer downloads a file from the Sia network and then transfers it to the Explorer, a limit needs to be established to prevent an excessive number of files being downloaded at the same time and overwhelming the Sharer's computer.
-4. Maximum Number of Peers: The maximum number of connections a Sharer is willing to permit simultaneously. 
-5. PeerJS Key: Currently PeerJS is used to facilitate direct peer-to-peer connections between Sharers and Explorers. Currently a free API key is required to use its service (has a limit of 50 concurrent connections)
-6. API Port Number: The default connection port number for the Sia API is 9980. This normally remains unchanged unless you have changed it due to clashes with other apps. 
-7. Host: The URL for the STUN server. Currently this is 0.peerjs.com as PeerJS is the current STUN server
-8. Port: The port number for the STUN server. Currently 9000 for PeerJS
-9. Path: The path for the STUN server. Currently left blank as it is optional.
+On first use of the app, the Your Current Settings section will have blank values (except for API Port Number to connect to Sia). Scroll down to Change Settings to change the values:<br><p></p>
+1. Sharer ID: The ID that you share publicly (e.g. social media, forums, etc) to allow other Sia users to find you and view/purchase files. This is chosen from one of your Sia addresses.<br><p></p>
+2. Explorer ID: The ID that identifies you when you view another users files and make purchases. This is chosen from one of your Sia addresses.<br><p></p>
+3. Maximum Buffer Size: Since a Sharer downloads a file from the Sia network and then transfers it to the Explorer, a limit needs to be established to prevent an excessive number of files being downloaded at the same time and overwhelming the Sharer's computer.<br><p></p>
+4. Maximum Number of Peers: The maximum number of connections a Sharer is willing to permit simultaneously. <br><p></p>
+5. PeerJS Key: Currently PeerJS is used to facilitate direct peer-to-peer connections between Sharers and Explorers. Currently a free API key is required to use its service (has a limit of 50 concurrent connections)<br><p></p>
+6. API Port Number: The default connection port number for the Sia API is 9980. This normally remains unchanged unless you have changed it due to clashes with other apps. <br><p></p>
+7. Host: The URL for the STUN server. Currently this is 0.peerjs.com as PeerJS is the current STUN server<br><p></p>
+8. Port: The port number for the STUN server. Currently 9000 for PeerJS<br><p></p>
+9. Path: The path for the STUN server. Currently left blank as it is optional.<br><p></p>
 Once you have changed the values, click Confirm Settings
-Under Change Public and Private Keys, click Generate New Keys to create a new Public Key and a Private Key.
-1. Public Key: This is publicly shared along with your Sharer ID. This is used by other Explorers to encrypt a verification message. The ability of the Sharer to successfully decrypt it with the associated private key and return the decrypted message gives the Explorer confidence that they are actually viewing the Sharer's files
-2. Private Key: Used by the Sharer to decrypt verification message from Explorers.  
-My Files
+Under Change Public and Private Keys, click Generate New Keys to create a new Public Key and a Private Key.<br><p></p>
+1. Public Key: This is publicly shared along with your Sharer ID. This is used by other Explorers to encrypt a verification message. The ability of the Sharer to successfully decrypt it with the associated private key and return the decrypted message gives the Explorer confidence that they are actually viewing the Sharer's files<br><p></p>
+2. Private Key: Used by the Sharer to decrypt verification message from Explorers.  <br><p></p>
+<h3>My Files</h3>
 This section lists all the files that you have uploaded to the Sia network. Here you can choose to share and unshare files, as well as set a price if you wish to sell your files.
-To share a file, click on Share for the file you wish to share. A section labeled Rename and edit settings of your file here will appear at the bottom:
-1. File Name: Change the name of the file you wish to change it
-2. New Description: Provide a description of the file for Explorers
-3. New Price: If you wish to sell your file, specify a price, else just set the price to 0.
+To share a file, click on Share for the file you wish to share. A section labeled Rename and edit settings of your file here will appear at the bottom:<br><p></p>
+1. File Name: Change the name of the file you wish to change it<br><p></p>
+2. New Description: Provide a description of the file for Explorers<br><p></p>
+3. New Price: If you wish to sell your file, specify a price, else just set the price to 0.<br><p></p>
 Click Confirm Share to confirm sharing. A File ID (i.e. a Sia address) is generated as a unique identifier for the file.
-Clicking confirm actually renames the file to incorporate the new details of the file (separated by ^) in the following format:
-SiaStoneFile^FileName^FileDescription^FilePrice^FileID.FileExtension
-Only files in this format will be shared. You can check in the Sia-UI to see the name change.
+Clicking confirm actually renames the file to incorporate the new details of the file (separated by ^) in the following format:<br><p></p>
+SiaStoneFile^FileName^FileDescription^FilePrice^FileID.FileExtension<br><p></p>
+Only files in this format will be shared. You can check in the Sia-UI to see the name change.<br><p></p>
 To unshare a file, just click the Unshare button. The file will then be renamed to the original file name plus its extension (e.g. .jpg, .doc, .pdf etc).
-Share Sia Files
+<h3>Share Sia Files</h3>
 To start sharing your files, click on the Enable button. Explorers who have your Sharer ID and public key will now be able to view/download/purchase your files. In the command line, if successful, you should see the output Connected to STUN server. To stop sharing, press the Disable button. Please note that you need to leave this app running to continue sharing your files.
 Sia Explore
 This section is where you can view the files of other Sia users (i.e. Sharers). Enter the Sharer ID and Public Key into the input boxes and press Connect. A random string will also be generated, encrypted and sent to the Sharer for verification.
