@@ -29,6 +29,7 @@
     "js-binarypack": "0.0.9",
     "node-rsa": "^0.4.2",
     "path": "^0.12.7",
+    "peerjs": "^0.3.14",
     "reliable": "^1.0.0",
     "reliable-npm": "^0.2.8",
     "request": "^2.81.0",
