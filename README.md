@@ -1,4 +1,5 @@
 # SiaStone
+
 This app allows you to share and sell your Sia files, as well as download and buy files from other Sia users by merging WebRTC (via the PeerJS wrapper) and the Sia API
 
 <h2>Overview</h2>
@@ -9,19 +10,33 @@ Just a quick note on some of the terminology I will use: <br><p></p>
 1. Explorer: A Sia user who views/downloads/purchases the file of another Sia user (the 'client' if you will in terms of the traditional client-server model). An Explorer identifies themselves to another Sia user whose sharing their files via an Explorer ID (i.e. a Sia address). <br><p></p>
 2. Sharer: A Sia user who shares their files for viewing/download/purchase for other Sia users (the 'server' if you will in terms of the traditional client-server model). A Sharer is accessed with a combination of a Sharer ID (i.e. a Sia address) and a Public Key (used to verify the identity of the Sharer to the Explorer).<br><p></p>
 3. Verification (or Confirmation) message: An Explorer uses a public key from the Sharer to encrypt a random string and send it to the Sharer. If the Sharer can decrypt the message with the associated private key, this gives the Explore confidence they are viewing the files of the actual Sharer.<br><p></p>
-<h2>Requirements</h2>
-1. Siad running with the wallet unlocked<br><p></p>
-2. Google Chrome (I developed this with Chrome so I am confident that it works with this browser. I have not tried other browsers extensively, but FireFox is definitely not compatible with some of the functionalities of PeerJS).<br><p></p>
-3. Node.js installed<br><p></p>
-4. A free PeerJS cloud API key from http://peerjs.com/peerserver <br><p></p>
-<h2>Walkthrough</h2>
-<h3>Start up</h3>
-1. Download the SiaStone zip file from GitHub and unzip<br><p></p>
-2. In the command line of your operating system, navigate to the SiaStone directory<br><p></p>
-3. Type 'npm install'. This will install the required modules for the app to run.<br><p></p>
-4. Once 'npm install' has completed, type 'node SiaStone'. If successful, you should get a message saying "Listening on Port 3000". <br><p></p>
-5. In your browser (preferably Chrome), type 'localhost:3000'. This should give you the 'Settings Page'.<br><p></p>
-6. For subsequent uses of the app, just follow steps 4 and 5.<br><p></p>
+
+## Requirements
+
+1. siad running with the wallet unlocked
+1. Node.js
+1. Git
+1. Google Chrome (I developed this with Chrome so I am confident that it works with this browser. I have not tried other browsers extensively, but FireFox is definitely not compatible with some of the functionalities of PeerJS).
+1. A free PeerJS cloud API key from http://peerjs.com/peerserver
+
+## Walkthrough
+
+### Start up
+
+```bash
+# Download SiaStone source.
+git clone https://github.com/PeerAcc34/SiaStone.git
+cd SiaStone
+
+# Install required modules.
+npm install
+
+# Start SiaStone server.
+node SiaStone
+```
+
+In your browser (preferably Chrome), navigate to http://localhost:3000. This should give you the 'Settings Page'.
+
 <h3>Settings Page</h3>
 The first page that you will see is the Settings page. This page is where you set your Explorer ID that you will use to view and buy files of other Sia users, as well as set your Sharer ID which you publicize to allow other Sia users to view and buy your files. 
 On first use of the app, the Your Current Settings section will have blank values (except for API Port Number to connect to Sia). Scroll down to Change Settings to change the values:<br><p></p>
@@ -45,8 +60,12 @@ To share a file, click on Share for the file you wish to share. A section labele
 2. New Description: Provide a description of the file for Explorers<br><p></p>
 3. New Price: If you wish to sell your file, specify a price, else just set the price to 0.<br><p></p>
 Click Confirm Share to confirm sharing. A File ID (i.e. a Sia address) is generated as a unique identifier for the file.
-Clicking confirm actually renames the file to incorporate the new details of the file (separated by ^) in the following format:<br><p></p>
-SiaStoneFile^FileName^FileDescription^FilePrice^FileID.FileExtension<br><p></p>
+Clicking confirm actually renames the file to incorporate the new details of the file (separated by ^) in the following format:
+
+```
+SiaStoneFile^FileName^FileDescription^FilePrice^FileID.FileExtension
+```
+
 Only files in this format will be shared. You can check in the Sia-UI to see the name change.<br><p></p>
 To unshare a file, just click the Unshare button. The file will then be renamed to the original file name plus its extension (e.g. .jpg, .doc, .pdf etc).
 <h3>Share Sia Files</h3>
