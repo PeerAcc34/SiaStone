@@ -7,431 +7,388 @@
   <meta http-equiv="Content-Language" content="en-us">
 </head>
 
- <style media="screen">
-
-  table, th, td {
-      border: 1px solid black;
-  }
+<style media="screen">
+  table,
+  th,
   td {
-      word-wrap: break-word;
+    border: 1px solid black;
   }
-  </style>
+
+  td {
+    word-wrap: break-word;
+  }
+</style>
 
 <%include partials/aff.ejs%>
   <%include partials/loggedInNav.ejs%>
 
-      <script type="text/javascript" src="/public/assets/jquery.min.js"></script>
-      <script type="text/javascript" src="/public/assets/peer.js"></script>
+    <script type="text/javascript" src="/public/assets/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/assets/peer.js"></script>
 
-      <script type="text/javascript">
+    <script type="text/javascript">
+      window.onload = function() {
+        var input = document.getElementById("rid").focus();
+      }
 
-        window.onload = function() {
-          var input = document.getElementById("rid").focus();
+      var connectedPeer;
+      var PurchaseID;
+      var jqueryDownload;
+      var downloadName; //this is the variable that the download name will be set to
+
+      //Set up the PeerJS connection
+      var peer = new Peer('<%-ExploreID%>', {
+        key: '<%-PeerJSKey%>',
+        host: '<%-Host%>',
+        port: '<%-Port%>',
+        path: '<%-Path%>',
+        debug: 3,
+
+        //Setup a log field for PeerJS connection
+        logFunction: function() {
+          var copy = Array.prototype.slice.call(arguments).join(' ');
+          $('#log').append(copy + '<br>');
         }
+      });
 
-		var connectedPeer;
-        var PurchaseID;
-        var jqueryDownload;
-        var downloadName; //this is the variable that the download name will be set to
+      //Open the PeerJS connection
+      peer.on('open', function(id) {
+        $('#pid').text(id);
+        var RandMSG = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 10);
+        $('#RandZone').text('The random string to be encrypted to verify the Sharer is: ' + RandMSG + '. If the Sharer can return the message decrypted, this verifies the Sharer.');
+      });
 
-		//Set up the PeerJS connection
-        var peer = new Peer('<%-ExploreID%>', {
-          key: '<%-PeerJSKey%>',
-          host:'<%-Host%>',
-          port:'<%-Port%>',
-          path: '<%-Path%>',
-          debug: 3,
+      //A function to show the purchase area to confirm your purchase
+      function ShowPurchaseZone() {
+        var obj = document.getElementById("PurchaseZone");
+        if (obj.style.display == "block")
+          obj.style.display = "none";
+        else
+          obj.style.display = "block";
+      };
 
-		//Setup a log field for PeerJS connection
-          logFunction: function() {
-            var copy = Array.prototype.slice.call(arguments).join(' ');
-            $('#log').append(copy + '<br>');
-          }
-        });
-
-		//Open the PeerJS connection
-		peer.on('open', function(id) {
-          $('#pid').text(id);
-          var RandMSG = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 10);
-          $('#RandZone').text('The random string to be encrypted to verify the Sharer is: '+RandMSG+'. If the Sharer can return the message decrypted, this verifies the Sharer.');
-        });
-
-		//A function to show the purchase area to confirm your purchase
-        function ShowPurchaseZone() {
-          var obj = document.getElementById("PurchaseZone");
-          if (obj.style.display == "block")
-            obj.style.display = "none";
-          else
-            obj.style.display = "block";
-        };
-
-		//Create a connection to facilitate the purchase of a file
-		var jqueryPurchaseFile;
-        $().ready(function() {
-          //jQuery function
-          jqueryPurchaseFile = function() {
+      //Create a connection to facilitate the purchase of a file
+      var jqueryPurchaseFile;
+      $().ready(function() {
+        //jQuery function
+        jqueryPurchaseFile = function() {
 
 
-            var requestedPeer = $('#rid').val();
-
-            var P = peer.connect(requestedPeer, {
-              label: 'Purchase',
-              metadata: {
-                siapath: $('#Siapath').val(),
-                		enc: $('#enc').val()
-              },
-              serialization: 'none'
-            });
-
-            P.on('open', function() {
-              // Receive messages
-              connect(P);
-            });
-          }
-        });
-
-        // //Javascript function to initate purchase connection
-        function jsPurchaseFile(SFileName, SFilePrice, SFileID, Siapath) {
-          //Invoke jQuery Function
           var requestedPeer = $('#rid').val();
-          $('#Sharer').val(requestedPeer); //Setup the Seller Address of the payment section for any potential file purchase
-          $('#hiddenSharer').val(requestedPeer);
-          $('#FileName').val(SFileName);
-          $('#hiddenFileName').val(SFileName);
-          $('#Price').val(SFilePrice);
-          $('#hiddenPrice').val(SFilePrice);
-          $('#Explorer').val('<%-ExploreID%>');
-          $('#hiddenExplorer').val('<%-ExploreID%>');
-          $('#FileID').val(SFileID);
-          $('#hiddenFileID').val(SFileID);
-          $('#Siapath').val(Siapath);
-          $('#hiddenSiapath').val(Siapath);
-          $('#totalPrice').val(parseInt(SFilePrice)+3.5); //adding 3.5 (2 is developer fee, .75 is trn fee for payment and .75 is trn fee for dev fee)
-          $('#hiddentotalPrice').val(parseInt(SFilePrice)+3.5);
-		  
+
+          var P = peer.connect(requestedPeer, {
+            label: 'Purchase',
+            metadata: {
+              siapath: $('#Siapath').val(),
+              enc: $('#enc').val()
+            },
+            serialization: 'none'
+          });
+
+          P.on('open', function() {
+            // Receive messages
+            connect(P);
+          });
+        }
+      });
+
+      // //Javascript function to initate purchase connection
+      function jsPurchaseFile(SFileName, SFilePrice, SFileID, Siapath) {
+        //Invoke jQuery Function
+        var requestedPeer = $('#rid').val();
+        $('#Sharer').val(requestedPeer); //Setup the Seller Address of the payment section for any potential file purchase
+        $('#hiddenSharer').val(requestedPeer);
+        $('#FileName').val(SFileName);
+        $('#hiddenFileName').val(SFileName);
+        $('#Price').val(SFilePrice);
+        $('#hiddenPrice').val(SFilePrice);
+        $('#Explorer').val('<%-ExploreID%>');
+        $('#hiddenExplorer').val('<%-ExploreID%>');
+        $('#FileID').val(SFileID);
+        $('#hiddenFileID').val(SFileID);
+        $('#Siapath').val(Siapath);
+        $('#hiddenSiapath').val(Siapath);
+        $('#totalPrice').val(parseInt(SFilePrice) + 3.5); //adding 3.5 (2 is developer fee, .75 is trn fee for payment and .75 is trn fee for dev fee)
+        $('#hiddentotalPrice').val(parseInt(SFilePrice) + 3.5);
+
+        ShowPurchaseZone();
+        jqueryPurchaseFile();
+      };
 
 
-          ShowPurchaseZone();
-          jqueryPurchaseFile();
-        };
+      //Function to start file download connection
+      $().ready(function() {
+        //jQuery function
+        jqueryDownload = function(SFile) {
+          var requestedPeer = $('#rid').val();
 
+          var z = peer.connect(requestedPeer, {
+            label: 'Download',
+            metadata: {
+              pid: PurchaseID,
+              enc: $('#enc').val(),
+              fileid: SFile
+            },
+            serialization: 'none'
+          });
 
-		  //Function to start file download connection
-		  $().ready(function() {
-          //jQuery function
-          jqueryDownload = function(SFile) {
-            var requestedPeer = $('#rid').val();
+          z.on('open', function() {
+            // Receive messages
+            connect(z);
 
-            var z = peer.connect(requestedPeer, {
-              label: 'Download',
-              metadata: {
-                pid: PurchaseID,
-                		enc: $('#enc').val(),
-				fileid: SFile
-              },
-              serialization: 'none'
-            });
+            // Send messages
+            z.send(SFile);
+          });
+        }
+      });
 
-            z.on('open', function() {
-              // Receive messages
-              connect(z);
+      //Function to initiate file download connection
+      function jsDownload(SFile, SFname, SFext) {
+        //Invoke jQuery Function
+        alert('You have selected to download a file. The Sharer will now download the file from the Sia network and transfer it to you, or send you an error message stating a reason for failure');
+        downloadName = SFname + '.' + SFext;
+        jqueryDownload(SFile);
 
-              // Send messages
-              z.send(SFile);
-            });
-          }
-        });
+      };
 
-		//Function to initiate file download connection
-        function jsDownload(SFile, SFname, SFext) {
-          //Invoke jQuery Function
-		  alert('You have selected to download a file. The Sharer will now download the file from the Sia network and transfer it to you, or send you an error message stating a reason for failure');
-          downloadName = SFname + '.' + SFext;
-          jqueryDownload(SFile);
+      // Await connections from others
+      peer.on('connection', connect);
 
-        };
+      //Print any connection errors
+      peer.on('error', function(err) {
+        alert(err);
+      });
 
-		// Await connections from others
-        peer.on('connection', connect);
+      var storArr; //Set the variable to store the arrays of incoming an incoming file transfer (a file is transferred via chunks of array buffers)
+      var totLength = 0; //Set a variable to set length of storArr
+      var runninglength = 0; //Update the position to place the next incoming arraybuffer into the storArr
 
-		//Print any connection errors
-        peer.on('error', function(err) {
-          alert(err);
-        });
+      // Handle a connection object.
+      function connect(c) {
 
-        var storArr; //Set the variable to store the arrays of incoming an incoming file transfer (a file is transferred via chunks of array buffers)
-        var totLength = 0; //Set a variable to set length of storArr
-        var runninglength = 0; //Update the position to place the next incoming arraybuffer into the storArr
+        //Display the list of files available from the Sharer in a table
+        c.on('data', function(data) {
+          if (c.label === 'FileList') {
 
-	    // Handle a connection object.
-        function connect(c) {
+            //Check if the Sharer was able to decrypt the verification message
+            if (JSON.parse(data)[JSON.parse(data).length - 1].Decrypt === $('#RandZone').text()) {
 
-		//Display the list of files available from the Sharer in a table
-          c.on('data', function(data) {
-            if (c.label === 'FileList') {
-
-				//Check if the Sharer was able to decrypt the verification message
-              if (JSON.parse(data)[JSON.parse(data).length - 1].Decrypt === $('#RandZone').text()) {
-
-				//If the message was successfully decrypted, write a successfully message
-                $('#SharerVerify').append('Sharer Verification: Success');
-              }
-			   //Else write a verification fail message
-			  else {
-                $('#SharerVerify').append('Sharer Verification: Fail');
-              }
-
-			//Create a table to display all the files that the Sharer has decided to share
-              var t = "";
-
-              for (var i = 0; i < JSON.parse(data).length - 1; i++) {
-                var tr = "<tr>";
-                tr += "<td>" + JSON.parse(data)[i].FileName + "</td>";
-				tr += "<td>" + JSON.parse(data)[i].Description + "</td>";
-                tr += "<td>" + JSON.parse(data)[i].FileExtension + "</td>";
-				tr += "<td>" + parseInt(JSON.parse(data)[i].FileSize)/1000000 + " MB</td>";
-                tr += "<td>" + JSON.parse(data)[i].FileID + "</td>";
-                tr += "<td>" + JSON.parse(data)[i].PurchaseStatus + "</td>";
-                tr += "<td>" + JSON.parse(data)[i].Price + "</td>";
-                if (JSON.parse(data)[i].PurchaseStatus !== 'FILENOTPURCHASED') {
-                  tr += '<td><input id="' + i + '" type="button" class="DownloadFile" value="Download" onclick="jsDownload(\'' + JSON.parse(data)[i].Siapath + '\',\'' + JSON.parse(data)[i].FileName + '\',\'' + JSON.parse(data)[i].FileExtension +
-                    '\');"></td>';
-                  tr += "<td></td>";
-                } else {
-                  tr += "<td></td>";
-                  tr += '<td><input id="' + i + '" type="button" class="PurchaseFile" value="Purchase" onclick="jsPurchaseFile(\'' + JSON.parse(data)[i].FileName + '\',\'' + JSON.parse(data)[i].Price + '\',\'' + JSON.parse(data)[i].FileID +
-                    '\',\'' + JSON.parse(data)[i].Siapath +
-                    '\');"></td>';
-                };
-
-                tr += "</tr>";
-                t += tr;
-              }
-              document.getElementById("PeerFiles").innerHTML += t;
-			  c.close();
-            };
-
-			//Prepare to receive a file from the Sharer
-            if (c.label === 'Download') {
-
-
-			//alert('the data constructo for download is: '+data.constructor);
-			
-              //if (data.constructor === ArrayBuffer) {
-			  if (typeof data != 'string') {
-					
-				//alert('buffer not string triggered');
-				//Add the incoming arraybuffers to the defined array buffer
-                storArr.set(new Uint8Array(data), runninglength);
-                runninglength += data.byteLength;
-                $('#downloadRate').text('Step 2/2 Sharer Transferring File: '+runninglength / totLength * 100 + '% downloaded');
-
-                //if the runninglength is now equal to the total length
-                //this means that we have received the entire file.
-                //We can now assemble the file as a blob for download and close the file transfer connection
-                if (runninglength === totLength) {
-					//convert the final arraybuffer to a blob
-                  var dataBlob = new Blob([storArr]);
-                  var url = window.URL.createObjectURL(dataBlob);
-				  //Generate a download link for the newly generated blob
-                  $('#DownloadFile').html('<a download=' + downloadName.replace(/ /g,"") + ' target="_blank" href="' + url + '">' + downloadName.replace(/ /g,"") + '</a>');
-                  //Now that we have received the file we can close the connection
-                  c.close();
-                }
-              } else if (typeof data === 'string') {
-			  
-				//get the array length to prepare the array buffer
-                if (data.substr(0, 2) === 'FL') {
-                  totLength = parseInt(data.substr(2, data.length - 2));
-                  runninglength = 0;
-                  storArr = new Uint8Array(totLength);
-                }
-				//Sharer unable to find file error message
-				 else if (data.substr(0, 3) === 'FNF') {
-                  alert('Sorry. The Sharer was not able to provide the file');
-                }
-				//Sharer transferring too many files  error message
-				 else if (data.substr(0, 4) === 'FESO') {
-                  alert('Sorry. The Sharer is currently transferring too many files. Please try again later');
-                }
-				//Sharer transferring too many files  error message
-				 else if (data.substr(0, 4) === 'DNUP') {
-                  $('#downloadRate').text('Step 1/2 Sharer Downloading File: '+ parseInt(data.substr(4, data.length - 4)) + '% downloaded');
-                }
-				else{
-				alert('some other string');
-
-				}
-
-              }
+              //If the message was successfully decrypted, write a successfully message
+              $('#SharerVerify').append('Sharer Verification: Success');
+            }
+            //Else write a verification fail message
+            else {
+              $('#SharerVerify').append('Sharer Verification: Fail');
             }
 
-			//On a Purchase connection, retreive the purchase address that the Explorer will use to pay for the file
-            if (c.label === 'Purchase') {
-              if (data.substr(0, 2) === 'PA') {
-                $('#PurchaseAddress').val(data.substr(2, data.length - 2));
-                $('#hiddenPurchaseAddress').val(data.substr(2, data.length - 2));
-                $("#Pay").prop("readonly", false);
+            //Create a table to display all the files that the Sharer has decided to share
+            var t = "";
 
-              }
-            }
-
-			//Handle payment
-            if (c.label === 'Payment') {
-
-			//If unsuccessful, generate an error message
-			if (data.substr(0, 4) === 'PYER') {
-			alert('Sorry. The payment was not successful');
+            for (var i = 0; i < JSON.parse(data).length - 1; i++) {
+              var tr = "<tr>";
+              tr += "<td>" + JSON.parse(data)[i].FileName + "</td>";
+              tr += "<td>" + JSON.parse(data)[i].Description + "</td>";
+              tr += "<td>" + JSON.parse(data)[i].FileExtension + "</td>";
+              tr += "<td>" + parseInt(JSON.parse(data)[i].FileSize) / 1000000 + " MB</td>";
+              tr += "<td>" + JSON.parse(data)[i].FileID + "</td>";
+              tr += "<td>" + JSON.parse(data)[i].PurchaseStatus + "</td>";
+              tr += "<td>" + JSON.parse(data)[i].Price + "</td>";
+              if (JSON.parse(data)[i].PurchaseStatus !== 'FILENOTPURCHASED') {
+                tr += '<td><input id="' + i + '" type="button" class="DownloadFile" value="Download" onclick="jsDownload(\'' + JSON.parse(data)[i].Siapath + '\',\'' + JSON.parse(data)[i].FileName + '\',\'' + JSON.parse(data)[i].FileExtension +
+                  '\');"></td>';
+                tr += "<td></td>";
+              } else {
+                tr += "<td></td>";
+                tr += '<td><input id="' + i + '" type="button" class="PurchaseFile" value="Purchase" onclick="jsPurchaseFile(\'' + JSON.parse(data)[i].FileName + '\',\'' + JSON.parse(data)[i].Price + '\',\'' + JSON.parse(data)[i].FileID +
+                  '\',\'' + JSON.parse(data)[i].Siapath +
+                  '\');"></td>';
               };
 
-			//If payment successful, record this transaction into the PremiumTransactions database
-			if (data.substr(0, 4) === 'PYSC') {
-
-
-					function savPurchaseID(){
-              $.ajax({
-              type: 'POST',
-              url: "/savePurchaseID",
-              data: {
-                sharer: c.peer, //Sharer
-				explorer: '<%-ExploreID%>',
-                purchaseid: data.substring(4, data.length-1)
-              },
-              dataType: 'json',
-              success: function(successResponse) {
-			  alert('Payment Successful. Please refresh the page and re-enter the Sharer details to download your purchased file ');
-              },
-              error: function(errorResponse) {
-			  alert('Sorry there was an error');
-              }
-              });
-					}
-
-					savPurchaseID();
-
-			  }
+              tr += "</tr>";
+              t += tr;
             }
-          });
+            document.getElementById("PeerFiles").innerHTML += t;
+            c.close();
+          };
+
+          //Prepare to receive a file from the Sharer
+          if (c.label === 'Download') {
 
 
-          c.on('close', function() {
-            alert(c.label + ' connection closed. Note that this is not necessarily an error message - connections are made/destroyed per interaction');
-          });
-        };
+            //alert('the data constructo for download is: '+data.constructor);
 
-         $(document).ready(function() {
+            //if (data.constructor === ArrayBuffer) {
+            if (typeof data != 'string') {
 
-          //Connect to a Sia user via there SharerID and Public Key
-          $('#connect').click(function() {
+              //alert('buffer not string triggered');
+              //Add the incoming arraybuffers to the defined array buffer
+              storArr.set(new Uint8Array(data), runninglength);
+              runninglength += data.byteLength;
+              $('#downloadRate').text('Step 2/2 Sharer Transferring File: ' + runninglength / totLength * 100 + '% downloaded');
 
-            $.ajax({
-              type: 'POST',
-              url: "/getExploreID",
-              data: {
-                rid: $('#rid').val(), //Post the SharerID to the server to check if there are previous PurchaseIDs, allowing the Explorer to download previously purchased files
-                pkey: $('#pubkey').val(), //The SharerID public key is used to encrypt the random text. If the sharer can decrypt it with the associated private key, the Sharer's identity is verified
-                random: $('#RandZone').text()
-              },
-              dataType: 'json',
-              success: function(successResponse) {
+              //if the runninglength is now equal to the total length
+              //this means that we have received the entire file.
+              //We can now assemble the file as a blob for download and close the file transfer connection
+              if (runninglength === totLength) {
+                //convert the final arraybuffer to a blob
+                var dataBlob = new Blob([storArr]);
+                var url = window.URL.createObjectURL(dataBlob);
+                //Generate a download link for the newly generated blob
+                $('#DownloadFile').html('<a download=' + downloadName.replace(/ /g, "") + ' target="_blank" href="' + url + '">' + downloadName.replace(/ /g, "") + '</a>');
+                //Now that we have received the file we can close the connection
+                c.close();
+              }
+            } else if (typeof data === 'string') {
 
-                PurchaseID = successResponse[1];
-                var encrypted = successResponse[2];
-                $('#enc').val(encrypted);
+              //get the array length to prepare the array buffer
+              if (data.substr(0, 2) === 'FL') {
+                totLength = parseInt(data.substr(2, data.length - 2));
+                runninglength = 0;
+                storArr = new Uint8Array(totLength);
+              }
+              //Sharer unable to find file error message
+              else if (data.substr(0, 3) === 'FNF') {
+                alert('Sorry. The Sharer was not able to provide the file');
+              }
+              //Sharer transferring too many files  error message
+              else if (data.substr(0, 4) === 'FESO') {
+                alert('Sorry. The Sharer is currently transferring too many files. Please try again later');
+              }
+              //Sharer transferring too many files  error message
+              else if (data.substr(0, 4) === 'DNUP') {
+                $('#downloadRate').text('Step 1/2 Sharer Downloading File: ' + parseInt(data.substr(4, data.length - 4)) + '% downloaded');
+              } else {
+                alert('some other string');
 
-                var requestedPeer = $('#rid').val();
-                $('#rid').prop("disabled", true); //set the seller id box to disabled to prevent change during session
-                var pc = peer.connect(requestedPeer, {
-                  label: 'FileList',
-                  serialization: 'none',
-                  metadata: {
-                    pid: PurchaseID, //submit the PurchaseID for the Sharer to know that you are a previous customer
-                    		enc: $('#enc').val()
+              }
+
+            }
+          }
+
+          //On a Purchase connection, retreive the purchase address that the Explorer will use to pay for the file
+          if (c.label === 'Purchase') {
+            if (data.substr(0, 2) === 'PA') {
+              $('#PurchaseAddress').val(data.substr(2, data.length - 2));
+              $('#hiddenPurchaseAddress').val(data.substr(2, data.length - 2));
+              $("#Pay").prop("readonly", false);
+
+            }
+          }
+
+          //Handle payment
+          if (c.label === 'Payment') {
+
+            //If unsuccessful, generate an error message
+            if (data.substr(0, 4) === 'PYER') {
+              alert('Sorry. The payment was not successful');
+            };
+
+            //If payment successful, record this transaction into the PremiumTransactions database
+            if (data.substr(0, 4) === 'PYSC') {
+
+
+              function savPurchaseID() {
+                $.ajax({
+                  type: 'POST',
+                  url: "/savePurchaseID",
+                  data: {
+                    sharer: c.peer, //Sharer
+                    explorer: '<%-ExploreID%>',
+                    purchaseid: data.substring(4, data.length - 1)
+                  },
+                  dataType: 'json',
+                  success: function(successResponse) {
+                    alert('Payment Successful. Please refresh the page and re-enter the Sharer details to download your purchased file ');
+                  },
+                  error: function(errorResponse) {
+                    alert('Sorry there was an error');
                   }
                 });
-                pc.on('open', function() {
-                  connect(pc);
-                });
-                pc.on('error', function(err) {
-                  alert(err);
-                });
-
-
-              },
-              error: function(errorResponse) {
-                alert('Purchase fail: '+JSON.stringify(errorResponse));//Print a message in case of error
               }
 
-            });
+              savPurchaseID();
+
+            }
+          }
+        });
+
+
+        c.on('close', function() {
+          alert(c.label + ' connection closed. Note that this is not necessarily an error message - connections are made/destroyed per interaction');
+        });
+      };
+
+      $(document).ready(function() {
+
+        //Connect to a Sia user via there SharerID and Public Key
+        $('#connect').click(function() {
+
+          $.ajax({
+            type: 'POST',
+            url: "/getExploreID",
+            data: {
+              rid: $('#rid').val(), //Post the SharerID to the server to check if there are previous PurchaseIDs, allowing the Explorer to download previously purchased files
+              pkey: $('#pubkey').val(), //The SharerID public key is used to encrypt the random text. If the sharer can decrypt it with the associated private key, the Sharer's identity is verified
+              random: $('#RandZone').text()
+            },
+            dataType: 'json',
+            success: function(successResponse) {
+
+              PurchaseID = successResponse[1];
+              var encrypted = successResponse[2];
+              $('#enc').val(encrypted);
+
+              var requestedPeer = $('#rid').val();
+              $('#rid').prop("disabled", true); //set the seller id box to disabled to prevent change during session
+              var pc = peer.connect(requestedPeer, {
+                label: 'FileList',
+                serialization: 'none',
+                metadata: {
+                  pid: PurchaseID, //submit the PurchaseID for the Sharer to know that you are a previous customer
+                  enc: $('#enc').val()
+                }
+              });
+              pc.on('open', function() {
+                connect(pc);
+              });
+              pc.on('error', function(err) {
+                alert(err);
+              });
+
+
+            },
+            error: function(errorResponse) {
+              alert('Purchase fail: ' + JSON.stringify(errorResponse)); //Print a message in case of error
+            }
+
           });
+        });
 
 
-          $('#Pay').click(function() {
-				//Trigger the payment for a file
-			  alert('Your payment is being processed now. Please wait up to 60 seconds for processing result.');
-              $.ajax({
-              type: 'POST',
-              url: "/sendPayment",
-              data: {
-                sharer: $('#hiddenSharer').val(), //Sharer
-                fileid: $('#hiddenFileID').val(), //FileID
-                explorer: '<%-ExploreID%>', //ExplorerID
-                purchaseaddress: $('#hiddenPurchaseAddress').val(),
-                price: $('#hiddenPrice').val()
-              },
-              dataType: 'json',
-              success: function(successResponse) {
-				//If payment successful, inform the Sharer of the success
-                if (successResponse == 1) {
-                  var requestedPeer = $('#rid').val();
-                  var py = peer.connect(requestedPeer, {
-                    label: 'Payment',
-                    serialization: 'none',
-                    metadata: {
-                      msg: 'Payment Success',
-                                      //enc: $('#enc').val(),
-				enc: $('#enc').val(),
-                      fileid: $('#hiddenFileID').val()
-                    }
-                  });
-                  py.on('open', function() {
-                    connect(py);
-                  });
-                  py.on('error', function(err) {
-                    alert(err);
-                  });
-                }
-				//If payment fail, create alert and inform sharer
-				else {
-                  alert('Payment Failed');
-                  var requestedPeer = $('#rid').val();
-                  var py = peer.connect(requestedPeer, {
-                    label: 'Payment',
-                    serialization: 'none',
-                    metadata: {
-                      msg: 'PF',
-                      		enc: $('#enc').val(),
-                      fileid: $('#hiddenFileID').val()
-                    }
-                  });
-                  py.on('open', function() {
-                    connect(py);
-                  });
-                  py.on('error', function(err) {
-                    alert(err);
-                  });
-                }
-              },
-			  //If there is an error, generate an alert and inform the Sharer
-              error: function(errorResponse) {
-                alert('Payment Failed: '+JSON.stringify(errorResponse));
+        $('#Pay').click(function() {
+          //Trigger the payment for a file
+          alert('Your payment is being processed now. Please wait up to 60 seconds for processing result.');
+          $.ajax({
+            type: 'POST',
+            url: "/sendPayment",
+            data: {
+              sharer: $('#hiddenSharer').val(), //Sharer
+              fileid: $('#hiddenFileID').val(), //FileID
+              explorer: '<%-ExploreID%>', //ExplorerID
+              purchaseaddress: $('#hiddenPurchaseAddress').val(),
+              price: $('#hiddenPrice').val()
+            },
+            dataType: 'json',
+            success: function(successResponse) {
+              //If payment successful, inform the Sharer of the success
+              if (successResponse == 1) {
                 var requestedPeer = $('#rid').val();
                 var py = peer.connect(requestedPeer, {
                   label: 'Payment',
                   serialization: 'none',
                   metadata: {
-                    msg: 'PF',
-                    		enc: $('#enc').val(),
+                    msg: 'Payment Success',
+                    //enc: $('#enc').val(),
+                    enc: $('#enc').val(),
                     fileid: $('#hiddenFileID').val()
                   }
                 });
@@ -442,99 +399,142 @@
                   alert(err);
                 });
               }
+              //If payment fail, create alert and inform sharer
+              else {
+                alert('Payment Failed');
+                var requestedPeer = $('#rid').val();
+                var py = peer.connect(requestedPeer, {
+                  label: 'Payment',
+                  serialization: 'none',
+                  metadata: {
+                    msg: 'PF',
+                    enc: $('#enc').val(),
+                    fileid: $('#hiddenFileID').val()
+                  }
+                });
+                py.on('open', function() {
+                  connect(py);
+                });
+                py.on('error', function(err) {
+                  alert(err);
+                });
+              }
+            },
+            //If there is an error, generate an alert and inform the Sharer
+            error: function(errorResponse) {
+              alert('Payment Failed: ' + JSON.stringify(errorResponse));
+              var requestedPeer = $('#rid').val();
+              var py = peer.connect(requestedPeer, {
+                label: 'Payment',
+                serialization: 'none',
+                metadata: {
+                  msg: 'PF',
+                  enc: $('#enc').val(),
+                  fileid: $('#hiddenFileID').val()
+                }
               });
-
-            });
+              py.on('open', function() {
+                connect(py);
+              });
+              py.on('error', function(err) {
+                alert(err);
+              });
+            }
           });
 
-
-        //Destroy any peer connections on close
-        window.onunload = window.onbeforeunload = function(e) {
-          if (!!peer && !peer.destroyed) {
-            peer.destroy();
-          }
-        };
-      </script>
+        });
+      });
 
 
-      <body>
-        Explore the files of other Sia users by entering their SharerID and Public Key
-		<p></p>
-		<!-- This is where the blob download link appears -->
-        <div id="DownloadFile"></div>
-		<!-- Display the rate at which a file is being downloaded -->
-        <div id="downloadRate"></div>
-        <div id="actions">
-          Your Explorer ID is <span id="pid"></span><br>
-		  <p></p>
-		  <span id="RandZone"></span><br>
-      <span id="SharerVerify"></span><br> Connect to a peer:
-          <input type="text" id="rid" placeholder="Sharer ID">
-          <input type="text" id="pubkey" placeholder="Sharer's Public Key">
-          <input class="button" type="button" value="Connect" id="connect">
-        </div>
-        <div id="enc">
+      //Destroy any peer connections on close
+      window.onunload = window.onbeforeunload = function(e) {
+        if (!!peer && !peer.destroyed) {
+          peer.destroy();
+        }
+      };
+    </script>
 
-        </div>
-        <div>
-          <table id="PeerFiles" style="table-layout: fixed; width: 100%">
-            <tr>
-              <th>File Name</th>
-			  <th>File Description</th>
-              <th>File Extension</th>
-			  <th>File Size</th>
-              <th>File ID</th>
-              <th>Purchase Status</th>
-              <th>Price</th>
-              <th>Download</th>
-              <th>Purchase</th>
-            </tr>
 
-          </table>
-        </div>
-        <div id="PurchaseZone" style="display: none;">
-          <h1>Confirm Your Purchase</h1>
+    <body>
+      Explore the files of other Sia users by entering their SharerID and Public Key
+      <p></p>
+      <!-- This is where the blob download link appears -->
+      <div id="DownloadFile"></div>
+      <!-- Display the rate at which a file is being downloaded -->
+      <div id="downloadRate"></div>
+      <div id="actions">
+        Your Explorer ID is <span id="pid"></span><br>
+        <p></p>
+        <span id="RandZone"></span><br>
+        <span id="SharerVerify"></span><br> Connect to a peer:
+        <input type="text" id="rid" placeholder="Sharer ID">
+        <input type="text" id="pubkey" placeholder="Sharer's Public Key">
+        <input class="button" type="button" value="Connect" id="connect">
+      </div>
+      <div id="enc">
 
-          <!-- <form id="PayForm"> -->
-          <label for="Sharer">Sharer</label>
-          <input id="Sharer" name="Sharer" readonly="readonly">
-          <input id="hiddenSharer" name="hiddenSharer" hidden>
-          <label for="Siapath">Siapath</label>
-          <input id="Siapath" name="Siapath" readonly="readonly">
-          <input id="hiddenSiapath" name="hiddenSiapath" hidden>
-          <label for="Explorer">Explorer</label>
-          <input id="Explorer" name="Explorer" readonly="readonly">
-          <input id="hiddenExplorer" name="hiddenExplorer" hidden>
-          <label for="PurchaseAddress">Purchase Address</label>
-          <input id="PurchaseAddress" name="PurchaseAddress" readonly="readonly">
-          <input id="hiddenPurchaseAddress" name="hiddenPurchaseAddress" hidden>
-          <label for="Price">Price</label>
-          <input id="Price" name="Price" readonly="readonly">
-          <input id="hiddenPrice" name="hiddenPrice" hidden>
-		  <p></p>
-		  <label for="totalPrice">Total Price(inc Dev and Trn fees)</label>
-          <input id="totalPrice" name="totalPrice" readonly="readonly">
-          <input id="hiddentotalPrice" name="hiddentotalPrice" hidden>
-          <label for="FileID">FileID</label>
-          <input id="FileID" name="FileID" readonly="readonly">
-          <input id="hiddenFileID" name="hiddenFileID" hidden>
-          <label for="FileName">FileName</label>
-          <input id="FileName" name="FileName" readonly="readonly">
-          <input id="hiddenFileName" name="hiddenFileName" hidden>
-          <button id="Pay" name="Pay" type="submit" readonly="readonly">Confirm Payment</button>
-          </form>
+      </div>
+      <div>
+        <table id="PeerFiles" style="table-layout: fixed; width: 100%">
+          <tr>
+            <th>File Name</th>
+            <th>File Description</th>
+            <th>File Extension</th>
+            <th>File Size</th>
+            <th>File ID</th>
+            <th>Purchase Status</th>
+            <th>Price</th>
+            <th>Download</th>
+            <th>Purchase</th>
+          </tr>
 
-        </div>
-        <div id="log"></div>
-      </body>
+        </table>
+      </div>
+      <div id="PurchaseZone" style="display: none;">
+        <h1>Confirm Your Purchase</h1>
+
+        <!-- <form id="PayForm"> -->
+        <label for="Sharer">Sharer</label>
+        <input id="Sharer" name="Sharer" readonly="readonly">
+        <input id="hiddenSharer" name="hiddenSharer" hidden>
+        <label for="Siapath">Siapath</label>
+        <input id="Siapath" name="Siapath" readonly="readonly">
+        <input id="hiddenSiapath" name="hiddenSiapath" hidden>
+        <label for="Explorer">Explorer</label>
+        <input id="Explorer" name="Explorer" readonly="readonly">
+        <input id="hiddenExplorer" name="hiddenExplorer" hidden>
+        <label for="PurchaseAddress">Purchase Address</label>
+        <input id="PurchaseAddress" name="PurchaseAddress" readonly="readonly">
+        <input id="hiddenPurchaseAddress" name="hiddenPurchaseAddress" hidden>
+        <label for="Price">Price</label>
+        <input id="Price" name="Price" readonly="readonly">
+        <input id="hiddenPrice" name="hiddenPrice" hidden>
+        <p></p>
+        <label for="totalPrice">Total Price(inc Dev and Trn fees)</label>
+        <input id="totalPrice" name="totalPrice" readonly="readonly">
+        <input id="hiddentotalPrice" name="hiddentotalPrice" hidden>
+        <label for="FileID">FileID</label>
+        <input id="FileID" name="FileID" readonly="readonly">
+        <input id="hiddenFileID" name="hiddenFileID" hidden>
+        <label for="FileName">FileName</label>
+        <input id="FileName" name="FileName" readonly="readonly">
+        <input id="hiddenFileName" name="hiddenFileName" hidden>
+        <button id="Pay" name="Pay" type="submit" readonly="readonly">Confirm Payment</button>
+        </form>
+
+      </div>
+      <div id="log"></div>
+    </body>
 
 
 </html>
 
 </section>
 </div>
-<div id="log"></div>
-<h3>PeerJS Connection Log</h3><p></p>
+<div id="log">
+  <h3>PeerJS Connection Log</h3></div>
+
+<p></p>
 </body>
 
 
