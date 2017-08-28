@@ -12,7 +12,7 @@ var path = require('path');
 
 //Connect to JSON table used to record settings and file transfers
 var db = require('diskdb');
-db = db.connect(path.join(__dirname, '../JDB/'), ['PremiumTransfers', 'Settings', 'PeerJsSwitch', 'RSA','PurchaseIDs','PendingPurchases']);
+db = db.connect(path.join(__dirname, '../JDB/'), ['PremiumTransfers', 'Settings', 'PeerJsSwitch', 'RSA', 'PurchaseIDs', 'PendingPurchases']);
 
 var crypto2 = require('crypto2');
 
@@ -45,14 +45,14 @@ var SiaWalSias = SiaWalSiasFn.SiaWalSias;
 module.exports = function(app) {
 
 
-//Get values used to view files of another Sia user via PeerJS
+  //Get values used to view files of another Sia user via PeerJS
   app.post('/getExploreID', urlencodedParser, function(req, res) {
 
     var requestedPeer = req.body.rid; //The SharerID of the Sia user whose files you want to see
     var publicKey = req.body.pkey.replace("\\n", ""); //The public key of the Sia user, used to verify the identity of the Sia user
     var randMSG = req.body.random; //The message to be encrypted with the Sia users public key. If the Sia user can decrypt with their private key, this confirms their identity
-	
-	console.log(publicKey);
+
+    console.log(publicKey);
 
     var PassShareSettings = db.Settings.find({
       SettingsFlag: 1
@@ -63,64 +63,49 @@ module.exports = function(app) {
       SharerID: requestedPeer
     });
 
-	var PurchaseID
-	if(Purchases==null){
-	PurchaseID = '';
-	}
-	else{
-    PurchaseID = Purchases.PurchaseID;
-	};
-	
-	console.log('the purchase id is: '+PurchaseID);
+    var PurchaseID
+    if (Purchases == null) {
+      PurchaseID = '';
+    } else {
+      PurchaseID = Purchases.PurchaseID;
+    };
+
+    console.log('the purchase id is: ' + PurchaseID);
 
     var key = new NodeRSA();
     key.importKey(publicKey, 'pkcs8-public-pem');
-	
-	    var encrypted = key.encrypt(randMSG, 'base64');
+
+    var encrypted = key.encrypt(randMSG, 'base64');
     console.log('encrypted: ', encrypted);
-	
-	        // try {
-	// //Generate encrypted message
-    // var encrypted = key.encrypt(randMSG, 'base64');
-    // console.log('encrypted: ', encrypted);
-            // var err = new Error('Encryption Error')
-            // throw err
-        // } catch (err) {
-            // // handle the error safely
-            // var encrypted = 'Encryption Error';
-            // console.log(err)
-        // }
-
-
 
     var ArgPassExploreIDSetting = [PassExploreIDSetting, PurchaseID, encrypted];
     res.json(ArgPassExploreIDSetting);
 
   });
-  
+
   //Store the PurchaseID
   //The next time an Explorer visits a Sharer, this PurchaseID will be provided
   //Since only the real Explorer would have this PurchaseID, any attempt by others to impersonate the Explorer to download purchased files will be thwarted
   //because the Sharer will check the Explorer against the PurchasedIDs table to verify purchases
-   app.post('/savePurchaseID', urlencodedParser, function(req, res) {
-	   
-	       var sharerid = req.body.sharer;
-		   var purchaseid = req.body.purchaseid;
-		   var explorerid = req.body.explorer;
-		   
-		   db.PurchaseIDs.save({
-			   
-			   SharerID: sharerid,
-			   ExplorerID: explorerid,
-			   PurchaseID: purchaseid
-			   
-		   });
-		   
-		   res.json(1);
-	   
-   });
+  app.post('/savePurchaseID', urlencodedParser, function(req, res) {
 
-   //Send the payment for a file
+    var sharerid = req.body.sharer;
+    var purchaseid = req.body.purchaseid;
+    var explorerid = req.body.explorer;
+
+    db.PurchaseIDs.save({
+
+      SharerID: sharerid,
+      ExplorerID: explorerid,
+      PurchaseID: purchaseid
+
+    });
+
+    res.json(1);
+
+  });
+
+  //Send the payment for a file
   app.post('/sendPayment', urlencodedParser, function(req, res) {
 
     var Price = req.body.price + '000000000000000000000000'; //convert to hastings (1SC = 10^24 hastings)
@@ -155,7 +140,7 @@ module.exports = function(app) {
 
       if (parseInt(results.substring(0, 3)) >= 200 && parseInt(results.substring(0, 3)) <= 210) {
         console.log(results);
-		//Developer fee transactions, with developer address and 2 siacoin (written in hastings)
+        //Developer fee transactions, with developer address and 2 siacoin (written in hastings)
         SiaWalSias("53313408818c3374968f6fa38917eb166b3d59c9b59d92167643541544235e25cbc2086ed56e", "2000000000000000000000000", function(results) {
           handleDevPayment(results);
         });
@@ -165,7 +150,7 @@ module.exports = function(app) {
       }
 
     };
-	//Pay the Sharer for the file
+    //Pay the Sharer for the file
     SiaWalSias(PurchaseAddress, Price, function(results) {
       handlePayment(results);
     });
@@ -176,7 +161,7 @@ module.exports = function(app) {
   app.post('/SiaRenterFiles', urlencodedParser, function(req, res) {
     console.log('sharetype is: ' + req.body.ShareType);
     console.log('filename is: ' + req.body.FileName);
-	
+
     if (req.body.ShareType === 'Share') {
 
       console.log('share triggered');
@@ -206,8 +191,8 @@ module.exports = function(app) {
           }
         };
 
-		//Shared files have the prefix SiaStoneFile
-		//Create a new file name based on original file name, description, price and file id, separated by ^
+        //Shared files have the prefix SiaStoneFile
+        //Create a new file name based on original file name, description, price and file id, separated by ^
         var NewSiaFilePath = 'SiaStoneFile^' + req.body.FileName.replace(/ /g, '%20') + '^' + req.body.FileDescription.replace(/ /g, '%20') + '^' + req.body.FilePrice + '^' + value + '.' + req.body.FileExtension;
         var OldSiaFilePath = req.body.SiaFilePath.replace(/ /g, '%20');
 
@@ -233,8 +218,8 @@ module.exports = function(app) {
           console.log('Rename Fail');
         }
       };
-	
-		//Unshare a file - reverting back to the original file name and its extension
+
+      //Unshare a file - reverting back to the original file name and its extension
       var NewSiaFilePath = req.body.FileName.replace(/ /g, '%20') + '.' + req.body.FileExtension;
       var OldSiaFilePath = req.body.SiaFilePath.replace(/ /g, '%20');
 
@@ -253,29 +238,28 @@ module.exports = function(app) {
     });
   });
 
-  
+
   //Display the Explorer/Sharer IDs, as well as PeerJS connection settings and the public/private keys
   app.get('/', function(req, res) {
 
     var Addresses = [];
-	
-	var pubKey;
-	var privKey;
-	
-	     var RSAKeys = db.RSA.find({
-        SettingsFlag: 1
-      });
-	//Get public/private keys if they exists, else ''
-	if(db.RSA.count()>0){
-		pubKey= RSAKeys[0].publicKey.replace("\\n", "");
-		privKey = RSAKeys[0].privateKey.replace("\\n", "");
-	}
-	else{
-		pubKey= '';
-		privKey = '';
-	};
-		
-	//Get Sharer ID and Explorer ID, as well as PeerJS connection settings
+
+    var pubKey;
+    var privKey;
+
+    var RSAKeys = db.RSA.find({
+      SettingsFlag: 1
+    });
+    //Get public/private keys if they exists, else ''
+    if (db.RSA.count() > 0) {
+      pubKey = RSAKeys[0].publicKey.replace("\\n", "");
+      privKey = RSAKeys[0].privateKey.replace("\\n", "");
+    } else {
+      pubKey = '';
+      privKey = '';
+    };
+
+    //Get Sharer ID and Explorer ID, as well as PeerJS connection settings
     if (db.Settings.count() > 0) {
 
       var PassShareSettings = db.Settings.find({
@@ -285,12 +269,12 @@ module.exports = function(app) {
       var PassExploreIDSetting = PassShareSettings[0].ExploreIDSetting;
       var PassMaxBufferSetting = PassShareSettings[0].MaxBufferSetting;
       var PassMaxPeerSetting = PassShareSettings[0].MaxPeerSetting;
-	  var PassHost = PassShareSettings[0].Host;
-	  var PassPort = PassShareSettings[0].Port;
-	  var PassPath = PassShareSettings[0].Path;
-	  var PassAPIPort = PassShareSettings[0].APIPortNumber;
-	  var PassPeerJSKey = PassShareSettings[0].PeerJSKey;
-	  
+      var PassHost = PassShareSettings[0].Host;
+      var PassPort = PassShareSettings[0].Port;
+      var PassPath = PassShareSettings[0].Path;
+      var PassAPIPort = PassShareSettings[0].APIPortNumber;
+      var PassPeerJSKey = PassShareSettings[0].PeerJSKey;
+
       SiaWalAdrs(function(AdrsVer) {
         Addresses.push(AdrsVer);
         res.render('PeerSettings', {
@@ -300,13 +284,13 @@ module.exports = function(app) {
             ExploreIDSetting: PassExploreIDSetting,
             MaxBufferSetting: PassMaxBufferSetting,
             MaxPeerSetting: PassMaxPeerSetting,
-			APIPortNumber: PassAPIPort,
-			Host: PassHost,
-			Port: PassPort,
-			Path: PassPath,
-			PeerJSKey: PassPeerJSKey,
-			PublicKey: pubKey,
-			PrivateKey: privKey
+            APIPortNumber: PassAPIPort,
+            Host: PassHost,
+            Port: PassPort,
+            Path: PassPath,
+            PeerJSKey: PassPeerJSKey,
+            PublicKey: pubKey,
+            PrivateKey: privKey
           }
         });
       });
@@ -320,13 +304,13 @@ module.exports = function(app) {
             ExploreIDSetting: '',
             MaxBufferSetting: '',
             MaxPeerSetting: '',
-			APIPortNumber: '',
-			Host: '',
-			Port: '',
-			Path: '',
-			PeerJSKey: '',
-			PublicKey: pubKey,
-			PrivateKey: privKey
+            APIPortNumber: '',
+            Host: '',
+            Port: '',
+            Path: '',
+            PeerJSKey: '',
+            PublicKey: pubKey,
+            PrivateKey: privKey
           }
         });
       });
@@ -339,61 +323,62 @@ module.exports = function(app) {
   app.post('/SiaStoneSettings', urlencodedParser, function(req, res) {
 
     var Addresses = [];
-	
-	  var sharer = req.body.sharer;
-	  var explorer = req.body.explorer;
-	  var maxbuffers = req.body.maxbuffers;
-	  var maxpeers = req.body.maxpeers;
-	  var peerjskey = req.body.peerjskey;
-	  var APIPortNumber = req.body.APIPortNumber;
-	  var host = req.body.host;
-	  var port = req.body.port;
-	  var path = req.body.path;
-	  
+
+    var sharer = req.body.sharer;
+    var explorer = req.body.explorer;
+    var maxbuffers = req.body.maxbuffers;
+    var maxpeers = req.body.maxpeers;
+    var peerjskey = req.body.peerjskey;
+    var APIPortNumber = req.body.APIPortNumber;
+    var host = req.body.host;
+    var port = req.body.port;
+    var path = req.body.path;
+
 
     //If there is already a settings record, delete the old one and replace with a new one
     if (db.Settings.count() > 0) {
       db.Settings.remove({
         SettingsFlag: 1
-      }, true)};
-	  
-      db.Settings.save({
-        ShareIDSetting: sharer,
-        ExploreIDSetting: explorer,
-        MaxBufferSetting: maxbuffers,
-        MaxPeerSetting: maxpeers,
-		Host: host,
-		Port: port,
-		Path: path,
-		PeerJSKey: peerjskey,
-		APIPortNumber: APIPortNumber,
-        SettingsFlag: 1
-      });
-    
-	res.json(1);
+      }, true)
+    };
+
+    db.Settings.save({
+      ShareIDSetting: sharer,
+      ExploreIDSetting: explorer,
+      MaxBufferSetting: maxbuffers,
+      MaxPeerSetting: maxpeers,
+      Host: host,
+      Port: port,
+      Path: path,
+      PeerJSKey: peerjskey,
+      APIPortNumber: APIPortNumber,
+      SettingsFlag: 1
+    });
+
+    res.json(1);
 
   });
 
-    //Generate new public and private keys
+  //Generate new public and private keys
   app.post('/GenRsaKeys', urlencodedParser, function(req, res) {
-	  	
-	    RSAKeys = db.RSA.remove({
+
+    RSAKeys = db.RSA.remove({
+      SettingsFlag: 1
+    });
+
+
+    crypto2.createKeyPair((err, privateKey, publicKey) => {
+      db.RSA.save({
+        publicKey: publicKey,
+        privateKey: privateKey,
         SettingsFlag: 1
       });
-		  
-	  
-	  crypto2.createKeyPair((err, privateKey, publicKey) => {
-			db.RSA.save({
-				publicKey: publicKey,
-				privateKey: privateKey,
-				SettingsFlag: 1
-			});
-			res.json(1);
-});
-	  
-	 
+      res.json(1);
+    });
+
+
   });
-  
+
 
   //Retreive the variables ready to setup a WebRTC connection to another Sia user
   app.get('/SiaExplore', function(req, res) {
@@ -402,17 +387,17 @@ module.exports = function(app) {
       SettingsFlag: 1
     });
     var PassExploreIDSetting = PassShareSettings[0].ExploreIDSetting;
-	var PassHost = PassShareSettings[0].Host;
-	var PassPort = PassShareSettings[0].Port;
-	var PassPath = PassShareSettings[0].Path;
-	var PassPeerJSKey = PassShareSettings[0].PeerJSKey;
-	
+    var PassHost = PassShareSettings[0].Host;
+    var PassPort = PassShareSettings[0].Port;
+    var PassPath = PassShareSettings[0].Path;
+    var PassPeerJSKey = PassShareSettings[0].PeerJSKey;
+
     res.render('SiaExplore', {
       ExploreID: PassExploreIDSetting,
-	  PeerJSKey: PassPeerJSKey,
-	  Host: PassHost,
-	  Port: PassPort,
-	  Path: PassPath
+      PeerJSKey: PassPeerJSKey,
+      Host: PassHost,
+      Port: PassPort,
+      Path: PassPath
     });
 
   });
@@ -432,14 +417,14 @@ module.exports = function(app) {
     });
   });
 
- 
+
   //Start PeerJS in Node, allowing other Sia users to view your files using your Sharer ID and public key
   var fork; //Create variable to trigger PeerJS
   var child; //Create variable to trigger PeerJS
-  //app.post('/PeerJsStart', urlencodedParser,function(req,res){
+
   app.post('/SiaExploreShare', urlencodedParser, function(req, res) {
 
-  //Start PeerJS for Node
+    //Start PeerJS for Node
     if (req.body.ShareStatus === 'Enable') {
       db.PeerJsSwitch.remove({
         SwitchFlag: 1
@@ -460,7 +445,7 @@ module.exports = function(app) {
         PeerFlag: 'Disable'
       });
     }
-	//End PeerJS for Node
+    //End PeerJS for Node
     if (req.body.ShareStatus === 'Disable') {
 
       child.kill('SIGINT');
@@ -479,7 +464,7 @@ module.exports = function(app) {
 
 
   });
-//View if PeerJS for Node is currently enabled or disabled
+  //View if PeerJS for Node is currently enabled or disabled
   app.get('/SiaExploreShare', function(req, res) {
 
     if (db.PeerJsSwitch.count() > 0) {
@@ -506,9 +491,5 @@ module.exports = function(app) {
         PeerFlag: 'Enable'
       });
     }
-
   });
-
-
-
 };
